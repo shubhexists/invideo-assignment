@@ -1,35 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import init, { add, subtract, multiply, divide } from "./wasm/backend";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [a, setA] = useState("");
+  const [b, setB] = useState("");
+  const [result, setResult] = useState<number | null>(null);
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  const handleCalculation = (operation: string) => {
+    const numA = parseFloat(a);
+    const numB = parseFloat(b);
+
+    let res = 0;
+    switch (operation) {
+      case "add":
+        res = add(numA, numB);
+        break;
+      case "subtract":
+        res = subtract(numA, numB);
+        break;
+      case "multiply":
+        res = multiply(numA, numB);
+        break;
+      case "divide":
+        res = divide(numA, numB);
+        break;
+      default:
+        res = 0;
+    }
+    setResult(res);
+  };
 
   return (
-    <>
+    <div>
+      <h1>Calculator</h1>
+      <input
+        type="number"
+        value={a}
+        onChange={(e) => setA(e.target.value)}
+        placeholder="Enter first number"
+      />
+      <input
+        type="number"
+        value={b}
+        onChange={(e) => setB(e.target.value)}
+        placeholder="Enter second number"
+      />
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <button onClick={() => handleCalculation("add")}>Add</button>
+        <button onClick={() => handleCalculation("subtract")}>Subtract</button>
+        <button onClick={() => handleCalculation("multiply")}>Multiply</button>
+        <button onClick={() => handleCalculation("divide")}>Divide</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      {result !== null && <h2>Result: {result}</h2>}
+    </div>
+  );
+};
 
-export default App
+export default App;
