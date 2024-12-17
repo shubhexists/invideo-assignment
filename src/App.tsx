@@ -1,61 +1,57 @@
-import { useState, useEffect } from "react";
-import init, { add, subtract, multiply, divide } from "./wasm/backend";
+import { useState } from "react";
+import Calculator from "./components/Calculator";
+import RenderCanvas from "./components/Shader";
+
+const CalculatorComponent = () => (
+  <div className="text-lg text-gray-700 w-screen">
+    <Calculator />
+  </div>
+);
+const Shader = () => (
+  <div className="p-6 text-lg text-gray-700 w-screen">
+    <RenderCanvas />
+  </div>
+);
 
 const App = () => {
-  const [a, setA] = useState("");
-  const [b, setB] = useState("");
-  const [result, setResult] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState("calculator");
 
-  useEffect(() => {
-    init();
-  }, []);
-
-  const handleCalculation = (operation: string) => {
-    const numA = parseFloat(a);
-    const numB = parseFloat(b);
-
-    let res = 0;
-    switch (operation) {
-      case "add":
-        res = add(numA, numB);
-        break;
-      case "subtract":
-        res = subtract(numA, numB);
-        break;
-      case "multiply":
-        res = multiply(numA, numB);
-        break;
-      case "divide":
-        res = divide(numA, numB);
-        break;
+  const renderContent = () => {
+    switch (activeTab) {
+      case "calculator":
+        return <CalculatorComponent />;
+      case "shader":
+        return <Shader />;
       default:
-        res = 0;
+        return null;
     }
-    setResult(res);
   };
 
   return (
-    <div>
-      <h1>Calculator</h1>
-      <input
-        type="number"
-        value={a}
-        onChange={(e) => setA(e.target.value)}
-        placeholder="Enter first number"
-      />
-      <input
-        type="number"
-        value={b}
-        onChange={(e) => setB(e.target.value)}
-        placeholder="Enter second number"
-      />
-      <div>
-        <button onClick={() => handleCalculation("add")}>Add</button>
-        <button onClick={() => handleCalculation("subtract")}>Subtract</button>
-        <button onClick={() => handleCalculation("multiply")}>Multiply</button>
-        <button onClick={() => handleCalculation("divide")}>Divide</button>
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <div className="flex w-full border-b border-gray-300">
+        <button
+          className={`flex-1 py-4 text-center ${
+            activeTab === "calculator"
+              ? "border-b-4 border-blue-500 text-blue-600 font-semibold"
+              : "text-gray-500 hover:text-blue-500"
+          }`}
+          onClick={() => setActiveTab("calculator")}
+        >
+          Calculator
+        </button>
+        <button
+          className={`flex-1 py-4 text-center ${
+            activeTab === "shader"
+              ? "border-b-4 border-blue-500 text-blue-600 font-semibold"
+              : "text-gray-500 hover:text-blue-500"
+          }`}
+          onClick={() => setActiveTab("shader")}
+        >
+          Shader
+        </button>
       </div>
-      {result !== null && <h2>Result: {result}</h2>}
+      <div className="flex-1 w-full  bg-[#2C2C2C] p-8">{renderContent()}</div>
     </div>
   );
 };
