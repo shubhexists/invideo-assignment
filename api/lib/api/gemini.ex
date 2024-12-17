@@ -46,7 +46,8 @@ GIVE A JSON with keys and their corresponding logics -
               }
             ]
           }
-        ]
+        ],
+        "generationConfig" => %{"response_mime_type" => "application/json"}
       }
 
       headers = [{"Content-Type", "application/json"}]
