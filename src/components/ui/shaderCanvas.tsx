@@ -6,7 +6,7 @@ interface ShaderCanvasProps {
   width?: number;
   height?: number;
   uniforms?: Record<string, number | number[]>;
-  onError?: () => void; // Error callback
+  onError?: () => void;
 }
 
 const ShaderCanvas: React.FC<ShaderCanvasProps> = ({

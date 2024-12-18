@@ -13,7 +13,7 @@ export default function ShaderGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasCanvasError, setHasCanvasError] = useState(false);
-
+  const [randomIndex, setRandomIndex] = useState(0);
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
   };
@@ -27,7 +27,7 @@ export default function ShaderGenerator() {
 
     try {
       const response = await fetch(
-        "ttps://invideo-assignment-1.onrender.com/api/generate_content",
+        " https://invideo-assignment-1.onrender.com/api/generate_content",
         {
           method: "POST",
           headers: {
@@ -60,6 +60,8 @@ export default function ShaderGenerator() {
   };
 
   const handleCanvasError = () => {
+    const random = Math.floor(Math.random() * (shaders.length - 1));
+    setRandomIndex(random);
     setHasCanvasError(true);
   };
 
@@ -85,16 +87,16 @@ export default function ShaderGenerator() {
       {hasCanvasError ? (
         <>
           <ShaderCanvas
-            vertexShader={shaders[0].Vertex}
-            fragmentShader={shaders[0].Fragment}
+            vertexShader={shaders[randomIndex].Vertex}
+            fragmentShader={shaders[randomIndex].Fragment}
           />
           <CodeDisplay
             title="Fallback Vertex Shader"
-            code={shaders[0].Vertex}
+            code={shaders[randomIndex].Vertex}
           />
           <CodeDisplay
             title="Fallback Fragment Shader"
-            code={shaders[0].Fragment}
+            code={shaders[randomIndex].Fragment}
           />
         </>
       ) : (
