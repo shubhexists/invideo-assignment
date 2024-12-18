@@ -44,6 +44,7 @@ pnpm run dev:wasm
 ## SCREENSHOTS
 
 ![Screenshot_2024-12-18_17 43 26](https://github.com/user-attachments/assets/504594c5-7b3e-4b80-828b-478cc547aad1)
-![Screenshot_2024-12-18_17 43 30](https://github.com/user-attachments/assets/57e6c419-b7c2-4![Screenshot_2024-12-18_17 43 41](https://github.com/user-attachments/assets/9393ba17-ed94-4e7a-9f09-d7b590a75ab7)
-c97-b93a-16940987c87e)
+![Screenshot_2024-12-18_17 43 30](https://github.com/user-attachments/assets/57e6c419-b7c2-4c97-b93a-16940987c87e)
+![Screenshot_2024-12-18_17 43 41](https://github.com/user-attachments/assets/9393ba17-ed94-4e7a-9f09-d7b590a75ab7)
+
 
