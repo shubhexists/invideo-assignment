@@ -1,116 +1,137 @@
-import { useState, useEffect } from "react";
-import init, { add, subtract, multiply, divide } from "../wasm/backend";
+import { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import init, {
+  add,
+  subtract,
+  multiply,
+  divide,
+  calculate,
+} from "../wasm/backend";
 
-export default function Calculator() {
-  const [display, setDisplay] = useState("");
-  const [result, setResult] = useState<number | null>(null);
+const WasmCalculator = () => {
+  const [num1, setNum1] = useState("");
+  const [num2, setNum2] = useState("");
+  const [result, setResult] = useState("");
+  const [error, setError] = useState("");
+  const [expression, setExpression] = useState("");
 
   useEffect(() => {
     init();
   }, []);
 
-  const handleInput = (value: string) => {
-    setDisplay((prev) => prev + value);
-  };
-
-  const handleCalculate = () => {
+  const handleOperation = async (operation: string) => {
     try {
-      const [a, op, b] = display.split(/([+\-*/])/);
-      const numA = parseFloat(a);
-      const numB = parseFloat(b);
+      setError("");
+      let calcResult;
 
-      let res: number;
-      switch (op) {
-        case "+":
-          res = add(numA, numB);
+      switch (operation) {
+        case "add":
+          calcResult = add(parseFloat(num1), parseFloat(num2));
           break;
-        case "-":
-          res = subtract(numA, numB);
+        case "subtract":
+          calcResult = subtract(parseFloat(num1), parseFloat(num2));
           break;
-        case "*":
-          res = multiply(numA, numB);
+        case "multiply":
+          calcResult = multiply(parseFloat(num1), parseFloat(num2));
           break;
-        case "/":
-          res = divide(numA, numB);
+        case "divide":
+          calcResult = divide(parseFloat(num1), parseFloat(num2));
           break;
         default:
           throw new Error("Invalid operation");
       }
-      setResult(res);
-    } catch (error) {
-      setResult(null);
-      setDisplay("Error");
+      setResult(calcResult.toString());
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     }
   };
 
-  const handleClear = () => {
-    setDisplay("");
-    setResult(null);
+  const handleCalculate = async () => {
+    try {
+      setError("");
+      const calcResult = calculate(expression);
+      setResult(calcResult.toString());
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
+    }
   };
 
-  const buttons = [
-    "7",
-    "8",
-    "9",
-    "/",
-    "4",
-    "5",
-    "6",
-    "*",
-    "1",
-    "2",
-    "3",
-    "-",
-    "0",
-    ".",
-    "+",
-    "=",
-  ];
-
   return (
-    <div className="min-h-screen bg-[#2C2C2C] flex items-center justify-center p-4">
-      <div className="calculator-body">
-        <div className="display-container">
-          <div className="display-glass">
-            <div className="display-content">
-              {display || "0"}
-              {result !== null && (
-                <AnimatePresence>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="result"
-                  >
-                    = {result}
-                  </motion.div>
-                </AnimatePresence>
+    <div className="container mx-auto p-4 max-w-md">
+      <Card>
+        <CardHeader>
+          <CardTitle>WASM Calculator</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="num1">Number 1</Label>
+              <Input
+                id="num1"
+                type="number"
+                value={num1}
+                onChange={(e) => setNum1(e.target.value)}
+                placeholder="Enter first number"
+                className="mb-2"
+              />
+              <Label htmlFor="num2">Number 2</Label>
+              <Input
+                id="num2"
+                type="number"
+                value={num2}
+                onChange={(e) => setNum2(e.target.value)}
+                placeholder="Enter second number"
+                className="mb-2"
+              />
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <Button onClick={() => handleOperation("add")}>Add</Button>
+                <Button onClick={() => handleOperation("subtract")}>
+                  Subtract
+                </Button>
+                <Button onClick={() => handleOperation("multiply")}>
+                  Multiply
+                </Button>
+                <Button onClick={() => handleOperation("divide")}>
+                  Divide
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="expression">Expression</Label>
+              <Input
+                id="expression"
+                type="text"
+                value={expression}
+                onChange={(e) => setExpression(e.target.value)}
+                placeholder="(25+17)*34"
+                className="mb-2"
+              />
+              <Button onClick={handleCalculate} className="w-full">
+                Calculate Expression
+              </Button>
+            </div>
+
+            <div className="mt-4">
+              <Label className="font-bold">Result:</Label>
+              {error ? (
+                <div className="text-red-500 font-semibold">{error}</div>
+              ) : (
+                <div className="text-2xl font-bold">{result}</div>
               )}
             </div>
           </div>
-        </div>
-        <div className="keypad">
-          {buttons.map((btn) => (
-            <Button
-              key={btn}
-              onClick={() =>
-                btn === "=" ? handleCalculate() : handleInput(btn)
-              }
-              className="calculator-button"
-            >
-              {btn}
-            </Button>
-          ))}
-        </div>
-        <Button onClick={handleClear} className="clear-button">
-          Clear
-        </Button>
-        <div className="gear gear-1"></div>
-        <div className="gear gear-2"></div>
-        <div className="gear gear-3"></div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
-}
+};
+
+export default WasmCalculator;

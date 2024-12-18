@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+use meval::eval_str;
 
 #[wasm_bindgen]
 pub fn add(a: f64, b: f64) -> f64 {
@@ -22,3 +23,12 @@ pub fn divide(a: f64, b: f64) -> f64 {
     }
     a / b
 }
+
+#[wasm_bindgen]
+pub fn calculate(expression: &str) -> Result<f64, String> {
+    match eval_str(expression) {
+        Ok(result) => Ok(result),
+        Err(e) => Err(format!("Error: {}", e)), 
+    }
+}
+

@@ -36,7 +36,6 @@ export default function ShaderGenerator() {
       const data = await response.json();
       const rawText = data.data.candidates[0].content.parts[0].text;
 
-      // console.log(rawText);
       const parsedData = JSON.parse(rawText);
 
       console.log("VERTEX :: ", parsedData["Vertex Shader"]);
@@ -59,7 +58,7 @@ export default function ShaderGenerator() {
         value={text}
         onChange={handleTextChange}
         placeholder="Enter text to generate shader"
-        className="w-full"
+        className="w-full text-white"
       />
       <Button onClick={handleSubmit} disabled={loading} className="w-full">
         {loading ? "Generating..." : "Generate Shader"}
