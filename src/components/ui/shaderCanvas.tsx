@@ -6,6 +6,7 @@ interface ShaderCanvasProps {
   width?: number;
   height?: number;
   uniforms?: Record<string, number | number[]>;
+  onError?: () => void; // Error callback
 }
 
 const ShaderCanvas: React.FC<ShaderCanvasProps> = ({
@@ -14,6 +15,7 @@ const ShaderCanvas: React.FC<ShaderCanvasProps> = ({
   width = 500,
   height = 500,
   uniforms = {},
+  onError,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -27,6 +29,7 @@ const ShaderCanvas: React.FC<ShaderCanvasProps> = ({
     const gl = canvas.getContext("webgl");
     if (!gl) {
       console.error("WebGL not supported");
+      onError?.();
       return;
     }
     glRef.current = gl;
@@ -40,12 +43,14 @@ const ShaderCanvas: React.FC<ShaderCanvasProps> = ({
 
     if (!vertexShaderObj || !fragmentShaderObj) {
       console.error("Failed to create shaders");
+      onError?.();
       return;
     }
 
     const program = createProgram(gl, vertexShaderObj, fragmentShaderObj);
     if (!program) {
       console.error("Failed to create program");
+      onError?.();
       return;
     }
     programRef.current = program;
@@ -131,11 +136,8 @@ const ShaderCanvas: React.FC<ShaderCanvasProps> = ({
       if (vertexShaderObj) gl.deleteShader(vertexShaderObj);
       if (fragmentShaderObj) gl.deleteShader(fragmentShaderObj);
     };
-  }, [vertexShader, fragmentShader, uniforms, width, height]);
+  }, [vertexShader, fragmentShader, uniforms, width, height, onError]);
 
-  /**
-   * Create a shader of the given type, compile it, and return the shader.
-   */
   const createShader = (
     gl: WebGLRenderingContext,
     type: number,
@@ -159,9 +161,6 @@ const ShaderCanvas: React.FC<ShaderCanvasProps> = ({
     return shader;
   };
 
-  /**
-   * Create a program, attach shaders, and link
-   */
   const createProgram = (
     gl: WebGLRenderingContext,
     vertexShader: WebGLShader,
@@ -174,7 +173,6 @@ const ShaderCanvas: React.FC<ShaderCanvasProps> = ({
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
 
-    // Check linking status
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       console.error(
         "Unable to initialize the shader program: " +

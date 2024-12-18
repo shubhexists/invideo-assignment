@@ -12,6 +12,7 @@ export default function ShaderGenerator() {
   const [fragmentShader, setFragmentShader] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasCanvasError, setHasCanvasError] = useState(false);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
@@ -22,10 +23,11 @@ export default function ShaderGenerator() {
     setError(null);
     setVertexShader("");
     setFragmentShader("");
+    setHasCanvasError(false);
 
     try {
       const response = await fetch(
-        "https://invideo-assignment-1.onrender.com/api/generate_content",
+        "ttps://invideo-assignment-1.onrender.com/api/generate_content",
         {
           method: "POST",
           headers: {
@@ -57,6 +59,10 @@ export default function ShaderGenerator() {
     }
   };
 
+  const handleCanvasError = () => {
+    setHasCanvasError(true);
+  };
+
   return (
     <div className="space-y-4 p-4">
       <Input
@@ -75,15 +81,35 @@ export default function ShaderGenerator() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      {vertexShader && fragmentShader && (
+
+      {hasCanvasError ? (
         <>
           <ShaderCanvas
-            vertexShader={vertexShader}
-            fragmentShader={fragmentShader}
+            vertexShader={shaders[0].Vertex}
+            fragmentShader={shaders[0].Fragment}
           />
-          <CodeDisplay title="Vertex Shader" code={vertexShader} />
-          <CodeDisplay title="Fragment Shader" code={fragmentShader} />
+          <CodeDisplay
+            title="Fallback Vertex Shader"
+            code={shaders[0].Vertex}
+          />
+          <CodeDisplay
+            title="Fallback Fragment Shader"
+            code={shaders[0].Fragment}
+          />
         </>
+      ) : (
+        vertexShader &&
+        fragmentShader && (
+          <>
+            <ShaderCanvas
+              vertexShader={vertexShader}
+              fragmentShader={fragmentShader}
+              onError={handleCanvasError}
+            />
+            <CodeDisplay title="Vertex Shader" code={vertexShader} />
+            <CodeDisplay title="Fragment Shader" code={fragmentShader} />
+          </>
+        )
       )}
     </div>
   );
