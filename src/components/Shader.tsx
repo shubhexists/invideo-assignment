@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CodeDisplay } from "./CodeDisplay";
 import ShaderCanvas from "@/components/ui/shaderCanvas";
+import { shaders } from "./Fallbacks";
 
 export default function ShaderGenerator() {
   const [text, setText] = useState("");
@@ -17,6 +20,9 @@ export default function ShaderGenerator() {
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
+    setVertexShader("");
+    setFragmentShader("");
+
     try {
       const response = await fetch(
         "http://localhost:4000/api/generate_content",
@@ -38,14 +44,14 @@ export default function ShaderGenerator() {
 
       const parsedData = JSON.parse(rawText);
 
-      console.log("VERTEX :: ", parsedData["Vertex Shader"]);
-      console.log("FRAGMENT :: ", parsedData["Fragment Shader"]);
-
       setVertexShader(parsedData["Vertex Shader"]);
       setFragmentShader(parsedData["Fragment Shader"]);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError("Failed to generate shader. Please try again.");
+      setError("Failed to generate shader. Using a fallback shader.");
+      const fallback = shaders[Math.floor(Math.random() * shaders.length)];
+      setVertexShader(fallback.Vertex);
+      setFragmentShader(fallback.Fragment);
     } finally {
       setLoading(false);
     }
@@ -63,12 +69,21 @@ export default function ShaderGenerator() {
       <Button onClick={handleSubmit} disabled={loading} className="w-full">
         {loading ? "Generating..." : "Generate Shader"}
       </Button>
-      {error && <p className="text-red-500">{error}</p>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       {vertexShader && fragmentShader && (
-        <ShaderCanvas
-          vertexShader={vertexShader}
-          fragmentShader={fragmentShader}
-        />
+        <>
+          <ShaderCanvas
+            vertexShader={vertexShader}
+            fragmentShader={fragmentShader}
+          />
+          <CodeDisplay title="Vertex Shader" code={vertexShader} />
+          <CodeDisplay title="Fragment Shader" code={fragmentShader} />
+        </>
       )}
     </div>
   );
