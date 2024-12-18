@@ -27,7 +27,7 @@ export default function ShaderGenerator() {
 
     try {
       const response = await fetch(
-        " https://invideo-assignment-1.onrender.com/api/generate_content",
+        "https://invideo-assignment-1.onrender.com/api/generate_content",
         {
           method: "POST",
           headers: {
